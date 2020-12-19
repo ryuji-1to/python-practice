@@ -1,4 +1,5 @@
 from typing import List, Tuple, Optional
+from collections import deque
 import random
 import hashlib
 
@@ -139,7 +140,61 @@ def getPair_half_sum(numbers: List[int]) -> Optional[Tuple[int, int]]:
             return val, num
 
 
+class Stack(object):
+
+    def __init__(self) -> None:
+        self.stack = []
+
+    def push(self, data) -> None:
+        self.stack.append(data)
+
+    def pop(self):
+        if self.stack:
+            return self.stack.pop()
+
+
+def validate_format(chars: str) -> bool:
+    lookup = {"{": "}", "[": "]", "(": ")"}
+    stack = []
+    for c in chars:
+        if c in lookup.keys():
+            stack.append(lookup[c])
+        if c in lookup.values():
+            if not stack:
+                return False
+            if c != stack.pop():
+                return False
+    if stack:
+        return False
+    return True
+
+
+class Que(object):
+
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, data):
+        self.queue.append(data)
+
+    def dequeue(self):
+        if self.queue:
+            return self.queue.pop(0)
+
+
+def reverse(queue):
+    new_queue = deque()
+    while queue:
+        new_queue.append(queue.pop())
+
+    return new_queue
+
+
 if __name__ == '__main__':
-    numbers = [11, 2, 5, 9, 10, 3]
-    t = 12
-    print(getPair_half_sum(numbers))
+    q = deque()
+    q.append(1)
+    q.append(2)
+    q.append(3)
+    q.append(4)
+    q = reverse(q)
+    print(q)
