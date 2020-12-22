@@ -1,7 +1,9 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Iterator
 from collections import deque
 import random
 import hashlib
+import operator
+from collections import Counter
 
 
 def bubble_sort(numbers: List[int]) -> List[int]:
@@ -190,11 +192,76 @@ def reverse(queue):
     return new_queue
 
 
+class Node(object):
+    def __init__(self, value: int) -> None:
+        self.value = value
+        self.left = None
+        self.right = None
+
+
+def insert(node: Node, value: int) -> Node:
+    if node is None:
+        return Node(value)
+    if value < node.value:
+        node.left = insert(node.left, value)
+    else:
+        node.right = insert(node.right, value)
+    return node
+
+
+def find_pair(pairs: List[Tuple[int, int]]) -> Iterator[Tuple[int, int]]:
+    cache = {}
+    for pair in pairs:
+        first, second = pair[0], pair[1]
+        value = cache.get(second)
+        if not value:
+            cache[first] = second
+        elif value == first:
+            yield pair
+
+
+def find_max_value(value: str):
+    cache = []
+    for a in value:
+        if a.isalpha():
+            cache.append(a.lower())
+    List = Counter(cache).most_common()
+    print(cache)
+    return List[0]
+
+
+def count_chars_v1(strings: str) -> Tuple[str, int]:
+    strings = strings.lower()
+    # l = []
+    # for char in strings:
+    #     if not char.isspace():
+    #         l.append((char, strings.count(char)))
+    l = [(c, strings.count(c)) for c in strings if not c.isspace()]
+    return max(l, key=operator.itemgetter(1))
+
+
+def count_chars_v2(strings: str) -> Tuple[str, int]:
+    strings = strings.lower()
+    d = {}
+    for char in strings:
+        if not char.isspace():
+            d[char] = d.get(char, 0) + 1
+    max_key = max(d, key=d.get)
+    return max_key, d[max_key]
+
+
+def count_chars_v3(strings: str) -> Tuple[str, int]:
+    strings = strings.lower()
+    d = Counter()
+    for char in strings:
+        print(d)
+        if not char.isspace():
+            d[char] += 1
+    max_key = max(d, key=d.get)
+    print(d)
+    return max_key, d[max_key]
+
+
 if __name__ == '__main__':
-    q = deque()
-    q.append(1)
-    q.append(2)
-    q.append(3)
-    q.append(4)
-    q = reverse(q)
-    print(q)
+    l = "hello my name is world."
+    print(find_max_value(l))
