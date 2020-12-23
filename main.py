@@ -3,6 +3,7 @@ from collections import deque
 import random
 import hashlib
 import operator
+import time
 from collections import Counter
 
 
@@ -262,6 +263,77 @@ def count_chars_v3(strings: str) -> Tuple[str, int]:
     return max_key, d[max_key]
 
 
+def memoize(f):
+    cache = {}
+
+    def _wrapper(n):
+        if n not in cache:
+            cache[n] = f(n)
+        return cache[n]
+    return _wrapper
+
+
+# @memoize
+def long_func(num: int) -> int:
+    r = 0
+    for i in range(10000000):
+        r += num * i
+    return r
+
+
+def min_count_remove(x: List[int], y: List[int]) -> None:
+    # count_x = {}
+    # count_y = {}
+    # for i in x:
+    #     count_x[i] = count_x.get(i, 0) + 1
+    # for i in y:
+    #     count_y[i] = count_y.get(i, 0) + 1
+    counter_x = Counter(x)
+    counter_y = Counter(y)
+
+    for key_x, value_x in counter_x.items():
+        value_y = counter_y.get(key_x)
+        if value_y:
+            if value_x < value_y:
+                x[:] = [i for i in x if i != key_x]
+            elif value_x > value_y:
+                y[:] = [i for i in y if i != key_x]
+
+
+def remove_zero(numbers: List[int]) -> None:
+    if numbers and numbers[0] == 0:
+        numbers.pop(0)
+        remove_zero(numbers)
+
+
+def list_to_int(numbers: List[int]) -> int:
+    sum_numbers = 0
+    for i, num in enumerate(reversed(numbers)):
+        sum_numbers += num * (10 ** i)
+    return sum_numbers
+
+
+def list_to_int_plus_one(numbers: List[int]) -> int:
+    i = len(numbers) - 1
+    numbers[i] += 1
+    while 0 < i:
+        if numbers[i] != 10:
+            remove_zero(numbers)
+            break
+
+        numbers[i] = 0
+        numbers[i-1] += 1
+        i -= 1
+    else:
+        if numbers[0] == 10:
+            numbers[0] = 1
+            numbers.append(0)
+    return list_to_int(numbers)
+
+
 if __name__ == '__main__':
-    l = "hello my name is world."
-    print(find_max_value(l))
+    l = [1, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5]
+    l_counter = Counter(l)
+    print(l_counter)
+    for i, v in l_counter.items():
+        print(i, v)
