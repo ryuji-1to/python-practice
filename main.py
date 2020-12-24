@@ -6,6 +6,7 @@ import operator
 import time
 from collections import Counter
 import operator
+from itertools import permutations
 
 
 def bubble_sort(numbers: List[int]) -> List[int]:
@@ -373,13 +374,80 @@ def snake_string_v2(chars: str, depth: int) -> List[List[str]]:
     return result
 
 
+def get_max_sequence_sum(numbers: List[int]) -> int:
+    result_sequence, sum_sequence = 0, 0
+    for num in numbers:
+        # temp_sum_sequence = sum_sequence + num
+        # if num < temp_sum_sequence:
+        #     sum_sequence = temp_sum_sequence
+        # else:
+        #     sum_sequence = num
+        sum_sequence = max(num, sum_sequence + num)
+
+        # if result_sequence < sum_sequence:
+        #     result_sequence = sum_sequence
+        result_sequence = max(result_sequence, sum_sequence)
+    return result_sequence
+
+
+def find_max_circular_sequence(numbers: List[int]) -> int:
+    max_sequence_sum = get_max_sequence_sum(numbers)
+    invert_numbers = []
+    all_sum = 0
+    for num in numbers:
+        all_sum += num
+        invert_numbers.append(-num)
+    max_wrap_sequence = all_sum-(-get_max_sequence_sum(invert_numbers))
+    return max(max_sequence_sum, max_wrap_sequence)
+
+
+def delete_duplicate_v1(numbers: List[int]) -> None:
+    tmp = []
+    for num in numbers:
+        if num not in tmp:
+            tmp.append(num)
+    numbers[:] = tmp
+    print(numbers)
+
+
+def delete_duplicate_v2(numbers: List[int]) -> None:
+    tmp = [numbers[0]]
+    i, len_num = 0, len(numbers) - 1
+    while i < len_num:
+        if numbers[i] != numbers[i + 1]:
+            tmp.append(numbers[i + 1])
+        i += 1
+    numbers[:] = tmp
+    print(numbers)
+
+
+def delete_duplicate_v3(numbers: List[int]) -> None:
+    i, len_numbers = 0, len(numbers) - 1
+    while i < len(numbers)-1:
+        if numbers[i] == numbers[i + 1]:
+            numbers.remove((numbers[i]))
+            i -= 1
+        i += 1
+
+
+def delete_duplicate_v4(numbers: List[int]) -> None:
+    i = len(numbers) - 1
+    while i > 0:
+        if numbers[i] == numbers[i - 1]:
+            numbers.pop(i)
+        i -= 1
+
+
+def all_perms(elements: List[int]) -> Iterator[List[int]]:
+
+    if len(elements) <= 1:
+        yield elements
+    else:
+        for perm in all_perms(elements[1:]):
+            for i in range(len(elements)):
+                yield perm[:i] + elements[0:1] + perm[i:]
+
+
 if __name__ == '__main__':
-    # numbers = [str(i) for j in range(5) for i in range(10)]
-    # strings = "".join(numbers)
-    # for line in snake_string_v1(strings):
-    #     print("".join(line))
-    import string
-    alphabet = [s for _ in range(2) for s in string.ascii_lowercase]
-    strings = "".join(alphabet)
-    for line in snake_string_v2(strings, 2):
-        print("".join(line))
+    for p in all_perms([1, 2, 3, 4, 5]):
+        print(p)
