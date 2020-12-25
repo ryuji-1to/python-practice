@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional, Iterator
+from typing import List, Tuple, Optional, Iterator, Generator
 from collections import deque
 import random
 import hashlib
@@ -448,6 +448,45 @@ def all_perms(elements: List[int]) -> Iterator[List[int]]:
                 yield perm[:i] + elements[0:1] + perm[i:]
 
 
+def is_palindrome(strings: str) -> bool:
+    len_strings = len(strings)
+    if not len_strings:
+        return False
+    if len_strings == 1:
+        return True
+    start, end = 0, len_strings-1
+    while start < end:
+        if strings[start] != strings[end]:
+            return False
+        start += 1
+        end -= 1
+    return True
+
+
+def find_palindrome(strings: str, left: int, right: int):
+    # result = []
+    while 0 <= left and right <= len(strings) - 1:
+        if strings[left] != strings[right]:
+            break
+        yield strings[left: right + 1]
+        left -= 1
+        right += 1
+
+
+def find__all_palindrome(strings: str):
+    # result = []
+    len_strings = len(strings)
+    if not len_strings:
+        yield
+    if len_strings == 1:
+        yield strings
+
+    for i in range(1, len_strings - 1):
+        yield from find_palindrome(strings, i - 1, i + 1)
+        yield from find_palindrome(strings, i - 1, i)
+
+
 if __name__ == '__main__':
-    for p in all_perms([1, 2, 3, 4, 5]):
-        print(p)
+    s = []
+    [s.append(i) for i in range(10)]
+    print(s)
