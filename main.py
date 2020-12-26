@@ -1,12 +1,8 @@
-from typing import List, Tuple, Optional, Iterator, Generator
+from typing import List, Tuple, Optional, Iterator
 from collections import deque
-import random
 import hashlib
 import operator
-import time
 from collections import Counter
-import operator
-from itertools import permutations
 
 
 def bubble_sort(numbers: List[int]) -> List[int]:
@@ -39,7 +35,8 @@ def binary_search(numbers: List[int], value: int) -> int:
 
 
 def binary_search_2(numbers: List[int], value: int) -> int:
-    def _binary_search(numbers: List[int], value: int, left: int, right: int) -> int:
+    def _binary_search(numbers: List[int], value: int,
+                       left: int, right: int) -> int:
         if left > right:
             return - 1
 
@@ -54,10 +51,10 @@ def binary_search_2(numbers: List[int], value: int) -> int:
     _binary_search(numbers, value, 0, len(numbers)-1)
 
 
-class Node(object):
-    def __init__(self, data, next_node=None):
-        self.data = data
-        self.next = next_node
+# class Node(object):
+#     def __init__(self, data, next_node=None):
+#         self.data = data
+#         self.next = next_node
 
 
 class LinkedList(object):
@@ -239,8 +236,8 @@ def count_chars_v1(strings: str) -> Tuple[str, int]:
     # for char in strings:
     #     if not char.isspace():
     #         l.append((char, strings.count(char)))
-    l = [(c, strings.count(c)) for c in strings if not c.isspace()]
-    return max(l, key=operator.itemgetter(1))
+    ln = [(c, strings.count(c)) for c in strings if not c.isspace()]
+    return max(ln, key=operator.itemgetter(1))
 
 
 def count_chars_v2(strings: str) -> Tuple[str, int]:
@@ -423,7 +420,7 @@ def delete_duplicate_v2(numbers: List[int]) -> None:
 
 def delete_duplicate_v3(numbers: List[int]) -> None:
     i, len_numbers = 0, len(numbers) - 1
-    while i < len(numbers)-1:
+    while i < len_numbers - 1:
         if numbers[i] == numbers[i + 1]:
             numbers.remove((numbers[i]))
             i -= 1
@@ -507,7 +504,53 @@ def order_even_odd_last_v2(numbers: List[int]) -> None:
             j -= 1
 
 
+def order_change_index_v1(chars: List[str], indexes: List[int]) -> str:
+    tmp = [None] * len(chars)
+    for i, index in enumerate(indexes):
+        tmp[index] = chars[i]
+    return "".join(tmp)
+
+
+def order_change_index_v2(chars: List[str], indexes: List[int]) -> str:
+    i, len_indexes = 0, len(indexes) - 1
+    while i < len_indexes:
+        while i != indexes[i]:
+            index = indexes[i]
+            chars[index], chars[i] = chars[i], chars[index]
+            indexes[index], indexes[i] = indexes[i], indexes[index]
+        i += 1
+    return "".join(chars)
+
+
+NUM_ALPHABET_MAPPING = {
+    0: "+",
+    1: "@",
+    2: "ABC",
+    3: "DEF",
+    4: "GHI",
+    5: "JKL",
+    6: "MNO",
+    7: "PQRS",
+    8: "TUV",
+    9: "WXYZ",
+}
+
+
+def phone_mnemonic_v1(phone_numbers: str) -> List[str]:
+    phone_number = [int(s) for s in phone_numbers.replace("-", "")]
+    candidate = []
+    tmp = [""] * len(phone_number)
+
+    def find_candidate_alphabet(digit: int = 0) -> None:
+        if digit == len(phone_number):
+            candidate.append("".join(tmp))
+        else:
+            for char in NUM_ALPHABET_MAPPING[phone_number[digit]]:
+                tmp[digit] = char
+                find_candidate_alphabet(digit + 1)
+    find_candidate_alphabet()
+    return candidate
+
+
 if __name__ == '__main__':
-    l = [1, 4, 3, 3, 3, 3, 36, 9, 8, 4, 5, 6, 7, 8]
-    order_even_odd_last_v2(l)
-    print(l)
+    print(phone_mnemonic_v1("234"))
