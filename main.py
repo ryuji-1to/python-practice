@@ -1,9 +1,12 @@
+import random
+import string
 from typing import List, Tuple, Optional, Iterator, Generator
-from collections import deque
+from collections import deque, defaultdict
 import hashlib
 import operator
 from collections import Counter
 import math
+import sys
 
 
 def bubble_sort(numbers: List[int]) -> List[int]:
@@ -641,27 +644,189 @@ def is_prime_v4(num: int) -> bool:
     return True
 
 
+def taxi_cab_number(max_answer_num: int, match_answer_num: int = 2) -> List[Tuple[int, List[Tuple[int, int]]]]:
+    result = []
+    got_answer_count = 0
+    answer = 1
+    while got_answer_count < max_answer_num:
+        match_answer_count = 0
+        memo = defaultdict(list)
+
+        max_param = int(pow(answer, 1.0 / 3)) + 1
+
+        for x in range(1, max_param):
+            for y in range(x + 1, max_param):
+                if x ** 3 + y ** 3 == answer:
+                    match_answer_count += 1
+                    memo[answer].append((x, y))
+        if match_answer_count == max_answer_num:
+            result.append((answer, memo[answer]))
+            got_answer_count += 1
+        answer += 1
+    return result
+
+
+def felmer_last_theorem_v1(max_num: int, square_num: int) -> List[Tuple[int, int]]:
+    result = []
+    if square_num < 2:
+        return result
+    max_z = int(pow((max_num-1)**2+max_num**2, 1.0/square_num))
+    for x in range(1, max_num + 1):
+        for y in range(x + 1, max_num + 1):
+            for z in range(y + 1, max_z):
+                if pow(x, square_num) + pow(y, square_num) == pow(z, square_num):
+                    result.append((x, y, z))
+    return result
+
+
+def felmer_last_theorem_v2(max_num: int, square_num: int) -> List[Tuple[int, int]]:
+    result = []
+    if square_num < 2:
+        return result
+    for x in range(1, max_num + 1):
+        for y in range(x + 1, max_num + 1):
+            pow_sum = pow(x, square_num)+pow(y, square_num)
+            if pow_sum > sys.maxsize:
+                raise ValueError(x, y, z, square_num, pow_sum)
+            z = pow(pow_sum, 1.0 / square_num)
+            if not z.is_integer():
+                continue
+            z = int(z)
+            z_pow = pow(z, square_num)
+            if z_pow == pow_sum:
+                result.append((x, y, z))
+    return result
+
+
+def ceaser_cipher(text: str, shift: int) -> str:
+    result = ""
+    len_alphabet = ord("Z")-ord("A")+1
+    for char in text:
+        # if char.isupper():
+        #     alphabet = string.ascii_uppercase
+        # elif char.islower():
+        #     alphabet = string.ascii_lowercase
+        # else:
+        #     result += char
+        #     continue
+        # index = (alphabet.index(char)+shift) % len(alphabet)
+        # result += alphabet[index]
+        if char.isupper():
+            result += chr((ord(char)+shift-ord("A")) % len_alphabet+ord("A"))
+        elif char.islower():
+            result += chr((ord(char)+shift-ord("a")) % len_alphabet+ord("a"))
+        else:
+            result += char
+
+    return result
+
+
+def caeser_cipher_hack(text: str) -> Generator[Tuple[int, str], None, None]:
+    len_alphabet = ord("Z") - ord("A") + 1
+    # len_alphabet = len(string.ascii_uppercase)
+    for candidate_shift in range(1, len_alphabet + 1):
+        reverted = ""
+        for char in text:
+            # if char.isupper():
+            #     alphabet = string.ascii_uppercase
+            # elif char.islower():
+            #     alphabet = string.ascii_lowercase
+            # else:
+            #     reverted += char
+            #     continue
+            # index = alphabet.index(char) - candidate_shift
+            # if index < 0:
+            #     index += len_alphabet
+            # reverted += alphabet[index]
+            if char.isupper():
+                index = ord(char) - candidate_shift
+                if index < ord("A"):
+                    index += chr(index)
+                reverted += chr(index)
+            elif char.islower():
+                index = ord(char) - candidate_shift
+                if index < ord("a"):
+                    index += len_alphabet
+                reverted += chr(index)
+            else:
+                reverted += char
+        yield candidate_shift, reverted
+
+
+def hanoi(disk: int, src: str, dest: str, support: str):
+    if disk < 1:
+        return
+
+    hanoi(disk-1, src, support, dest)
+    print(f'move {disk} from {src} to {dest}')
+    hanoi(disk-1, support, dest, src)
+
+
+def get_hanoi_movement(disk: int, src: str, dest: str, support: str) -> List[Tuple[int, str]]:
+    result = []
+
+    def _hanoi(disk: int, src: str, dest: str, support: str):
+        if disk < 1:
+            return
+
+        _hanoi(disk-1, src, support, dest)
+        result.append((disk, src, dest))
+        _hanoi(disk - 1, support, dest, src)
+    _hanoi(disk, src, dest, support)
+    return result
+
+
+def generate_pascal_triangle(depth: int) -> List[List[int]]:
+    data = [[1] * (i + 1) for i in range(depth)]
+    for line in range(2, depth):
+        for i in range(1, line):
+            data[line][i] = data[line - 1][i - 1] + data[line - 1][i]
+    return data
+
+
+def print_pascal(data: List[int]) -> None:
+    max_digit = len(str(max(data[-1])))
+    width = max_digit+(max_digit % 2)+2
+    for i, line in enumerate(data):
+        numbers = "".join([str(i).center(width, " ") for i in line])
+        print((" " * int(width/2))*(len(data)-i), numbers)
+
+
+def generate_triangle_list(depth: int, max_num: int) -> List[List[int]]:
+    return [[random.randint(0, max_num) for _ in range(i)]for i in range(1, depth+1)]
+
+
+def print_triangle(data: List[List[int]]) -> None:
+    max_digit = len(str(max([max(l) for l in data])))
+    width = max_digit + (max_digit % 2) + 2
+    for index, line in enumerate(data):
+        numbers = "".join([str(i).center(width, " ") for i in line])
+        print(" " * int(width/2)*(len(data)-index), numbers)
+
+
+def sum_min_path(triangle: List[List[int]]) -> Optional[int]:
+    tree_sum = triangle[:]
+    j, len_triangle = 1, len(triangle)
+    if not len_triangle:
+        return
+    while j < len_triangle:
+        line = triangle[j]
+        line_path_sum = []
+        for i, value in enumerate(line):
+            if i == 0:
+                sum_value = line[i]+tree_sum[j-1][0]
+            elif i == len(line) - 1:
+                sum_value = line[i]+tree_sum[j-1][i-1]
+            else:
+                min_path = min(tree_sum[j-1][i-1], min([tree_sum[j-1][i]]))
+                sum_value = line[i]+min_path
+            line_path_sum.append(sum_value)
+        tree_sum[j] = line_path_sum
+        j += 1
+    return (min(tree_sum[-1]))
+
+
 if __name__ == '__main__':
-    import time
-    import random
-
-    numbers = [random.randint(0, 1000) for _ in range(100000)]
-    start = time.time()
-    for num in numbers:
-        is_prime_v1(num)
-    print('v1=>>>', time.time() - start)
-
-    start = time.time()
-    for num in numbers:
-        is_prime_v2(num)
-    print('v2=>>>', time.time()-start)
-
-    start = time.time()
-    for num in numbers:
-        is_prime_v3(num)
-    print('v3=>>>', time.time()-start)
-
-    start = time.time()
-    for num in numbers:
-        is_prime_v4(num)
-    print('v4=>>>', time.time()-start)
+    data = generate_triangle_list(5, 9)
+    print_triangle(data)
+    print('min_path -->>', sum_min_path(data))
